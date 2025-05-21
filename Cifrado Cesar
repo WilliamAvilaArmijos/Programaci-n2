@@ -1,0 +1,24 @@
+def cifrado_cesar(texto, desplazamiento):
+    resultado = ""
+    for caracter in texto:
+        if caracter.isalpha():  # Solo ciframos letras
+            nueva_letra = chr(ord(caracter) + desplazamiento)
+            resultado += nueva_letra
+        else:
+            resultado += caracter # Dejamos espacios y signos igual
+    return resultado
+def descifrado_cesar(texto, desplazamiento):
+    resultado = ""
+    for caracter in texto:
+        if caracter.isalpha():  # Solo ciframos letras
+            nueva_letra = chr(ord(caracter) - desplazamiento)
+            resultado += nueva_letra
+        else:
+            resultado += caracter # Dejamos espacios y signos igual
+    return resultado
+mensaje = "Hola"
+mensaje_des = "Krod"
+mensaje_cifrado = cifrado_cesar(mensaje, 3)
+mensaje_descifrado = descifrado_cesar(mensaje_des, 3)
+print(f"Mensaje cifrado: {mensaje_cifrado}")
+print(f"Mensaje descifrado: {mensaje_descifrado}")
