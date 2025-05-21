@@ -1,0 +1,14 @@
+import requests
+
+# URL de la página que queremos obtener
+url = "https://www.example.com"
+
+# Realizar la solicitud HTTP
+respuesta = requests.get(url)
+
+# Mostrar el código HTML obtenido
+if respuesta.status_code == 200:
+    print("HTML de la página:")
+    print(respuesta.text[:500])  # Mostramos solo los primeros 500 caracteres
+else:
+    print(f"Error al obtener la página: {respuesta.status_code}")
