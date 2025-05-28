@@ -1,0 +1,24 @@
+from cryptography.fernet import Fernet
+
+# 1. Generar la clave
+#clave = Fernet.generate_key()
+clave2 = "hCBk5BMKeEa-4ZJeNkf09Y7VEBUSol4dooy4WIHXKS0="
+#fernet = Fernet(clave)
+fernet2 = Fernet(clave2)
+
+# 2. Pedir mensaje al usuario
+#mensaje_usuario = input("Escribe un mensaje para cifrar: ")
+mensaje_usuario = "Cifra este mensaje"
+
+# 3. Convertir mensaje a bytes
+mensaje_bytes = mensaje_usuario.encode()
+
+# 4. Cifrar el mensaje
+mensaje_cifrado = fernet2.encrypt(mensaje_bytes)
+print("Mensaje cifrado:", mensaje_cifrado)
+
+print(clave2)
+
+# 5. Descifrar el mensaje
+mensaje_descifrado = fernet2.decrypt(mensaje_cifrado)
+print("Mensaje descifrado:", mensaje_descifrado.decode())

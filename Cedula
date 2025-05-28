@@ -1,0 +1,37 @@
+def validar_cedula(cedula):
+    # Verificar que la cédula tenga 10 dígitos
+    if len(cedula) != 10 or not cedula.isdigit():
+        return False
+
+    # Extraer el código de provincia (primeros dos dígitos)
+    provincia = int(cedula[:2])
+    if provincia < 1 or provincia > 24:
+        return False
+
+    # Extraer el dígito verificador
+    digito_verificador = int(cedula[-1])
+
+    # Aplicar el algoritmo de validación
+    suma = 0
+    for i in range(9):
+        digito = int(cedula[i])
+        if i % 2 == 0:  # Posiciones impares
+            digito *= 2
+            if digito > 9:
+                digito -= 9
+        suma += digito
+
+    # Calcular el dígito verificador esperado
+    residuo = suma % 10
+    digito_calculado = 10 - residuo if residuo != 0 else 0
+
+    # Comparar con el dígito verificador de la cédula
+    return digito_calculado == digito_verificador
+
+
+# Ejemplo de uso
+cedula = "1711134065"
+if validar_cedula(cedula):
+    print("La cédula es válida.")
+else:
+    print("La cédula no es válida.")
