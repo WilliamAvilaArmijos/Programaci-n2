@@ -1,0 +1,14 @@
+import socket
+
+def verificar_conectividad(host, puerto):
+    try:
+        # Creamos un socket TCP/IP
+        socket.setdefaulttimeout(5)  # Tiempo máximo de espera: 5 segundos
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect((host, puerto))
+            print(f"✅ Conexión exitosa a {host} en el puerto {puerto}.")
+    except socket.error as e:
+        print(f"❌ No se pudo conectar a {host} en el puerto {puerto}: {e}")
+
+# Prueba con un servicio HTTP (por ejemplo, google.com en el puerto 80)
+verificar_conectividad("google.com", 80)
