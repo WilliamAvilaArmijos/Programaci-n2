@@ -1,0 +1,12 @@
+import socket
+
+def probar_conexion(host, puerto):
+    try:
+        my_socket = socket.create_connection((host, puerto), timeout=5)
+        print(f" Conexión exitosa a {host}:{puerto}")
+        my_socket.close()
+    except socket.error as e:
+        print(f"Falló la conexión a {host}:{puerto} -> {e}")
+
+# Prueba: conexión al puerto 443 (HTTPS) de Google
+probar_conexion("www.facebook.com", 443)
