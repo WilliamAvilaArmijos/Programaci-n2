@@ -1,0 +1,12 @@
+import socket
+
+def check_connection(host, port=80):
+    try:
+        sock = socket.create_connection((host, port), timeout=5)
+        sock.close()
+        print(f"Conexión exitosa a {host}:{port}")
+    except (socket.timeout, socket.error):
+        print(f"No se pudo conectar a {host}:{port}")
+
+# Prueba con un host (ej. google.com)
+check_connection("google.com")
