@@ -1,0 +1,39 @@
+import sqlite3
+
+# Conexión a la base de datos (para el ejemplo, usamos SQLite)
+conn = sqlite3.connect(':memory:')
+cursor = conn.cursor()
+
+# Creación de una tabla de usuarios
+cursor.execute("CREATE TABLE users (username TEXT, password TEXT)")
+cursor.execute("INSERT INTO users VALUES ('admin', '1234')") 
+cursor.execute("INSERT INTO users VALUES ('admin2', '1234')") 
+cursor.execute("INSERT INTO users VALUES ('admin3', '1234')") 
+cursor.execute("INSERT INTO users VALUES ('admin4', '1234')") 
+cursor.execute("INSERT INTO users VALUES ('admin5', '1234')") 
+cursor.execute("INSERT INTO users VALUES ('admin6', '1234')")  # Usuario de prueba
+
+# Simulación de entrada del usuario (sin protección contra SQL Injection)
+user_input = input("Ingresa tu nombre de usuario: ")
+password_input = input("Ingresa tu contraseña: ")
+
+# Consulta SQL vulnerable
+
+query = f"SELECT * FROM users WHERE username = '{user_input}' AND password = '{password_input}'"
+print(f"Ejecutando consulta: {query}")
+
+#' OR '1'='1' --  
+
+cursor.execute(query)
+result = cursor.fetchone()
+
+print("Resultado de la consulta:", result)  # Esto mostrará el contenido devuelto por la consulta SQL
+if result:
+    print("¡Acceso concedido!")
+else:
+    print("Acceso denegado.")
+
+conn.close()
+
+
+

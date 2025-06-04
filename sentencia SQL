@@ -1,0 +1,3 @@
+SELECT * FROM users WHERE username = 'admin' AND password = '1234'
+SELECT * FROM users WHERE username = '' OR '1'='1' --' AND password = '0'
+SELECT * FROM users WHERE username = '' OR '1'='1' 
