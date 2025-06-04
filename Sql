@@ -1,4 +1,6 @@
 import sqlite3
+import re
+import sys
 
 # Conexión a la base de datos (para el ejemplo, usamos SQLite)
 conn = sqlite3.connect(':memory:')
@@ -14,7 +16,15 @@ cursor.execute("INSERT INTO users VALUES ('admin5', '1234')")
 cursor.execute("INSERT INTO users VALUES ('admin6', '1234')")  # Usuario de prueba
 
 # Simulación de entrada del usuario (sin protección contra SQL Injection)
-user_input = input("Ingresa tu nombre de usuario: ")
+regex = r".*"
+# Pedir el nombre de usuario hasta que sea válido
+while True:
+    user_input = input("Ingresa tu nombre de usuario: ")
+    if re.match(regex, user_input):
+        print("Entrada válida.")
+        break  # Salir del bucle si la entrada es válida
+    else:
+        print("Entrada inválida. Solo se permiten letras. Inténtalo de nuevo.")
 password_input = input("Ingresa tu contraseña: ")
 
 # Consulta SQL vulnerable
@@ -25,13 +35,11 @@ print(f"Ejecutando consulta: {query}")
 #' OR '1'='1' --  
 
 cursor.execute(query)
-result = cursor.fetchone()
+result = cursor.fetchall()
 
-print("Resultado de la consulta:", result)  # Esto mostrará el contenido devuelto por la consulta SQL
-if result:
-    print("¡Acceso concedido!")
-else:
-    print("Acceso denegado.")
+print("Todos los usuarios en la tabla:")
+for fila in result:
+    print(f"Usuario: {fila[0]}, Contraseña: {fila[1]}")
 
 conn.close()
 
