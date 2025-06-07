@@ -11,7 +11,10 @@ for dato in datos:
         buffer.append(dato)
         print(f"Guardando: {dato}")
     else:
-        print(f"¡El buffer está lleno! No se puede guardar '{dato}'.")
+# El buffer está lleno: eliminar el más antiguo y agregar el nuevo
+       eliminado = buffer.pop(0)
+       buffer.append(dato)
+       print(f"¡El buffer esta lleno!. Se eliminó '{eliminado}' y se guardó: {dato}")
 
 # Mostramos el contenido final del buffer
 print("\nContenido del buffer:", buffer)
