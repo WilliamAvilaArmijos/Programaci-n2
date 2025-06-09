@@ -1,0 +1,19 @@
+# Simulación de un "buffer" que solo puede almacenar un número limitado de datos
+buffer = []  # Aquí guardaremos los datos
+tamaño_maximo = 3  # Definimos el tamaño del buffer
+
+# Lista de datos que queremos guardar
+datos = ["Hola", "Mundo", "Python", " Progamacion"]
+
+# Agregamos los datos al buffer
+for dato in datos:
+    if len(buffer) < tamaño_maximo:
+        buffer.append(dato)
+        print(f"Guardando: {dato}")
+    else:
+        eliminado = buffer.pop(0)  # Quitamos el primero (más antiguo)
+        buffer.append(dato)        # Agregamos el nuevo
+        print(f"Buffer lleno. Reemplazando '{eliminado}' con '{dato}'.")
+
+# Mostramos el contenido final del buffer
+print("\nContenido del buffer:", buffer)
