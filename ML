@@ -1,0 +1,15 @@
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+
+# Simulación de datos de tráfico de red (bytes enviados/recibidos)
+datos = np.array([[100, 200], [120, 220], [130, 210], [5000, 8000], [140, 230], [150, 240], [6000, 9000]])
+df = pd.DataFrame(datos, columns=["Bytes Enviados", "Bytes Recibidos"])
+
+# Entrenar modelo de detección de anomalías
+modelo = IsolationForest(contamination=0.1)  # 10% de datos considerados anómalos
+modelo.fit(df)
+
+# Predecir anomalías
+df["Anomalía"] = modelo.predict(df)
+print(df)
