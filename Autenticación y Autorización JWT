@@ -1,0 +1,121 @@
+import jwt
+import datetime
+from flask import Flask, request, jsonify
+from functools import wraps # Necesario para crear decoradores correctamente
+
+app = Flask(__name__)
+
+# --- Configuración ---
+# CLAVE SECRETA: ¡IMPORTANTE! En un entorno de producción, esta clave debe ser mucho más compleja
+# y almacenarse de forma segura (ej. variables de entorno).
+SECRET_KEY = "super_secreta_y_dificil_de_adivinar_12345!@#$"
+TOKEN_EXPIRATION_MINUTES = 30 # El token expirará en 30 minutos
+
+# --- Simulación de base de datos de usuarios (para este ejemplo) ---
+# En un proyecto real, esto interactuaría con una base de datos (ej. PostgreSQL, MongoDB, etc.)
+users_db = {
+    "usuario1": "clave123",
+    "admin": "adminpassword"
+}
+
+# --- Funciones de JWT ---
+
+def generar_token(username):
+    """
+    Genera un token JWT para el usuario dado.
+    Incluye el nombre de usuario y una fecha de expiración.
+    """
+    payload = {
+        "username": username,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=TOKEN_EXPIRATION_MINUTES),
+        "iat": datetime.datetime.utcnow() # Fecha de emisión del token
+    }
+    # Codifica el payload usando la clave secreta y el algoritmo HS256
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    return token
+
+# --- Decorador de Autenticación ---
+
+def token_required(f):
+    """
+    Decorador para proteger rutas que requieren un token JWT válido.
+    Verifica si hay un token en los encabezados de la solicitud,
+    lo decodifica y maneja errores de expiración o token inválido.
+    """
+    @wraps(f) # Mantiene los metadatos de la función original
+    def decorated(*args, **kwargs):
+        token = None
+        # Verifica si el token está presente en el encabezado 'x-access-token'
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        # Si no hay token, retorna un error de no autorizado
+        if not token:
+            return jsonify({'message': 'Se requiere un token de autenticación!'}), 401
+
+        try:
+            # Decodifica el token usando la clave secreta y el algoritmo
+            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            # Puedes pasar los datos del usuario decodificados a la función
+            # para que pueda acceder a ellos (ej. data['username'])
+            request.current_user = data['username'] # Almacenamos el usuario actual en el objeto request
+        except jwt.ExpiredSignatureError:
+            # Maneja el error si el token ha expirado
+            return jsonify({'message': 'El token ha expirado.'}), 401
+        except jwt.InvalidTokenError:
+            # Maneja el error si el token no es válido por cualquier otra razón
+            return jsonify({'message': 'El token es inválido.'}), 401
+        except Exception as e:
+            # Captura cualquier otra excepción inesperada
+            return jsonify({'message': f'Error inesperado al procesar el token: {str(e)}'}), 500
+
+        # Si el token es válido, ejecuta la función original
+        return f(*args, **kwargs)
+    return decorated
+
+# --- Rutas de la API ---
+
+@app.route('/login', methods=['POST'])
+def login():
+    """
+    Endpoint para que los usuarios inicien sesión y obtengan un token JWT.
+    Espera 'username' y 'password' en el cuerpo de la solicitud JSON.
+    """
+    auth = request.json
+    if not auth or not auth.get('username') or not auth.get('password'):
+        return jsonify({'message': 'Se requiere nombre de usuario y contraseña.'}), 400
+
+    username = auth['username']
+    password = auth['password']
+
+    # Simula la verificación de credenciales
+    if username in users_db and users_db[username] == password:
+        token = generar_token(username)
+        return jsonify({'message': 'Inicio de sesión exitoso.', 'token': token}), 200
+    else:
+        return jsonify({'message': 'Credenciales inválidas.'}), 401
+
+@app.route('/protected', methods=['GET'])
+@token_required # Aplica el decorador para proteger esta ruta
+def protected_route():
+    """
+    Ejemplo de una ruta protegida que solo es accesible con un token JWT válido.
+    """
+    # El nombre de usuario se puede acceder a través de request.current_user
+    return jsonify({
+        'message': f'¡Bienvenido, {request.current_user}! Has accedido a una ruta protegida.',
+        'data': 'Datos secretos a los que solo los usuarios autenticados tienen acceso.'
+    }), 200
+
+@app.route('/public', methods=['GET'])
+def public_route():
+    """
+    Ejemplo de una ruta pública que no requiere autenticación.
+    """
+    return jsonify({'message': 'Esta es una ruta pública. No se requiere autenticación.'}), 200
+
+# --- Ejecución de la Aplicación ---
+if __name__ == '__main__':
+    # Para ejecutar la aplicación: python your_script_name.py
+    # La aplicación estará disponible en http://127.0.0.1:5000/
+    app.run(debug=True) # debug=True recarga automáticamente el servidor al detectar cambios
